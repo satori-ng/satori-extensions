@@ -1,7 +1,7 @@
 import binascii
 import hashlib
 
-from satoricore.hooker import hook
+from hooker import hook
 
 __name__ = 'sha160'
 

@@ -1,7 +1,7 @@
 import binascii
 import magic
 
-from satoricore.hooker import hook
+from hooker import hook
 
 __name__ = 'mime'
 magic_obj = magic.Magic(flags=magic.MAGIC_MIME_TYPE)

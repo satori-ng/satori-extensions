@@ -1,6 +1,6 @@
 from entropy import shannon_entropy
 
-from satoricore.hooker import hook
+from hooker import hook
 
 __name__ = 'shannon'
 
