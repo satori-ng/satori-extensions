@@ -4,9 +4,8 @@ import magic
 from satoricore.hooker import hook
 
 __name__ = 'mime'
-
-
 magic_obj = magic.Magic(flags=magic.MAGIC_MIME_TYPE)
+
 
 @hook("with_open")
 def mime_file(satori_image, file_path, file_type, fd):
