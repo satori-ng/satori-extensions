@@ -3,7 +3,7 @@ import hashlib
 
 from hooker import hook
 
-__name__ = 'sha160'
+__name__ = 'sha1'
 
 @hook("with_open")
 def hash_file(satori_image, file_path, file_type, fd):
