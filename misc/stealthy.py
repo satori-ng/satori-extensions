@@ -7,11 +7,13 @@ __name__ = 'stealthy'
 @hook("post_close")
 def stealth_open(satori_image, file_path, file_type):
 
-	time_dict = (satori_image.get_attribute(file_path, 'times'))
+	time_dict = satori_image.get_attribute(file_path, 'times')
+	# print ("[>]", file_path, time_dict['atime'], time_dict['mtime'])
 	os.utime(
-		file_path, (
+		file_path,
+			(
 			time_dict['atime'],
-			time_dict['utime']
+			time_dict['mtime'],
 			),
 		)
-	satori_image.set_attribute(file_path, hex_digest, __name__, force_create=True)
+	# print ("[*]", file_path, time_dict['atime'], time_dict['mtime'])
