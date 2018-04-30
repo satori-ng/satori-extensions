@@ -7,7 +7,7 @@ __name__ = 'mime'
 magic_obj = magic.Magic(flags=magic.MAGIC_MIME_TYPE)
 
 
-@hook("with_open")
+@hook("imager.with_open")
 def mime_file(satori_image, file_path, file_type, fd):
     fd.seek(0)
     chunk = fd.read(1024)
@@ -16,6 +16,6 @@ def mime_file(satori_image, file_path, file_type, fd):
 
 
 
-@hook("on_end")
+@hook("imager.on_end")
 def clean_magic():
     magic_obj.close()

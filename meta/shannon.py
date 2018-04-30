@@ -5,7 +5,7 @@ from hooker import hook
 __name__ = 'shannon'
 
 
-@hook("with_open")
+@hook("imager.with_open")
 def calculate(satori_image, file_path, file_type, fd):
     fd.seek(0)
     e = shannon_entropy(fd.read())

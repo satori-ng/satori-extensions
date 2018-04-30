@@ -5,7 +5,7 @@ from hooker import hook
 
 __name__ = 'sha512'
 
-@hook("with_open")
+@hook("imager.with_open")
 def hash_file(satori_image, file_path, file_type, fd):
     fd.seek(0)
     hash_obj = hashlib.new(__name__)
