@@ -1,7 +1,7 @@
 # satori-extensions
-Extensions for the Satori-NG Suite 
 
-The *Satori Extensions* are the main way to extend the *Satori Suite's* functionalities. It uses [`hooker`](https://github.com/satori-ng/hooker), a standalone Python Package (available with `pip`) to add functions in *events* declared in the *Satori Suite* components.
+The *Satori Extensions* are the main way to extend the *Satori Suite's* functionalities.
+They use [`hooker`](https://github.com/satori-ng/hooker), a standalone Python Package (available with `pip`) to add functions in *events* declared in the *Satori Suite* components.
 
 Each extension is responsible to *gather*, *store*, *compare*, and even provide a way to *visualize* a single aspect of an Operating System instance.
 
@@ -50,12 +50,16 @@ def calculate(satori_image, file_path, file_type, fd):
 
 ## Non-data extensions
 
-The `stealthy` extension does not gather data. It just uses `os.utime` call to perform naive [`timestomping`](http://www.forensicswiki.org/wiki/Timestomp) (Reset Access Time to previous values) on the files opened by the `Imager`
+The [`stealthy`](https://github.com/satori-ng/satori-extensions/blob/master/misc/stealthy.py) extension does not gather data.
+
+It just uses [`os.utime`](https://docs.python.org/3/library/os.html#os.utime) call to perform naive [`timestomping`](http://www.forensicswiki.org/wiki/Timestomp) (resets access/modification times) on the files opened by the *Satori-Imager*.
+
+It does that using the `imager.post_close` event hook.
 
 
 ## Non-file extensions
 
-What about reading and storing the `iptables` rules of the Linux OS that is *Image*'d?
+What about reading and storing the `iptables` rules of the Linux OS that is `Image`'d?
 No files are opened (as a single `iptables-save` command has all useful information).
 
 This could be implemented using the `imager.on_start` event hook:
@@ -65,6 +69,7 @@ This could be implemented using the `imager.on_start` event hook:
 from hooker import hook
 from satoricore.image import _DATA_SECTION
 
+@hook('imager.on_start')
 def iptables_save(parser, args, satori_image):
   # Run the 'iptables-save' command and get the output
   proc = subprocess.Popen(['iptables-save'])
@@ -78,7 +83,73 @@ def iptables_save(parser, args, satori_image):
   )
 ```
 
+## Multiple functions - single file
+
+An extension file, say `bla.py` can contain all functions that are needed to Image the `bla` attribute of an OS instance.
+
+----
+`bla.py`
+```python
+from hooker import hook
+
+hook('imager.on_start')
+def calc_bla(parser, args, satori_image):
+  # Stuff...
+```
+----
+
+This same file can be used to also serve as *Satori-Differ* extension (and it is actually encouraged):
+
+----
+
+`bla.py`
+```python
+from hooker import hook
+
+hook('imager.on_start')
+def calc_bla(parser, args, satori_image):
+  # Stuff...
+
+hook('differ.on_start')
+def diff_bla(parser, args, source,
+  destination, results, diff_name):
+  # Stuff...
+```
+
+----
 
 
+When loading such file to a *Satori Component* all event hooks not registered in that component (`differ.on_start` is not registered in *Satori-Imager*), will be ignored.
 
+There also can be shared code in the *extension file*:
 
+----
+
+`bla.py`
+```python
+from hooker import hook
+from satoricore.image import SatoriImage
+import os
+
+def get_bla(image):
+  if type(image) == SatoriImage:
+    # Get 'bla' using some SatoriImage method
+    return bla_value
+  else:
+    # Get 'bla' using some os function
+    return bla_value
+  
+hook('imager.on_start')
+def calc_bla(parser, args, satori_image):
+  bla = get_bla(os)
+  # Stuff...
+
+hook('differ.on_start')
+def diff_bla(parser, args, source,
+  destination, results, diff_name):
+  sbla = get_bla(source)
+  dbla = get_bla(destination)
+  # Stuff...
+```
+
+----
