@@ -1,11 +1,14 @@
+import sys
+
 import hooker
 
 from satoricore.common import _STANDARD_EXT
 from satoricore.logger import ext_logger
 from satoricore.image.filesystem import _CONTENTS_S
 
-__name__ = 'text'
 
+__name__ = 'text'
+default_enc = sys.getdefaultencoding()
 
 @hooker.hook('imager.with_open', 'mime')
 def store_text(satori_image, file_path, file_type, fd):
@@ -32,7 +35,9 @@ def store_text(satori_image, file_path, file_type, fd):
 	if 'text' not in ftype: return None
 
 	fd.seek(0)
-	content = str(fd.read())
+	content = fd.read()
+	content = str(content, default_enc)
+
 	try:
 		satori_image.set_attribute(file_path, content, _CONTENTS_S, force_create=False)
 	except Exception as e:
@@ -43,13 +48,13 @@ def store_text(satori_image, file_path, file_type, fd):
 @hooker.hook('fuse.on_read')
 def read_text(satori_image, file_path, length, offset, fh, value):
 
-	print (fh)
 	contents = satori_image.get_attribute(file_path, _CONTENTS_S)
 	if not isinstance(contents, str):
 		ret = ""
+		return
 
-	elif offset <= len(contents) <= length + offset:
+	if offset <= len(contents) <= length + offset:
 		ret = contents[offset:length+offset]
-		# print(ret)
+
 	value['return'] = ret
 	return value['return']
