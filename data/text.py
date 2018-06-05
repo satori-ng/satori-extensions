@@ -19,6 +19,7 @@ def store_text(satori_image, file_path, file_type, fd):
 		return None
 	try:
 		ftype = satori_image.get_attribute(file_path, 'mime')
+
 	except Exception as e:
 		ext_logger.info("{}. File Type of '{}' is '{}'."
 			.format(
@@ -39,3 +40,16 @@ def store_text(satori_image, file_path, file_type, fd):
 
 
 
+@hooker.hook('fuse.on_read')
+def read_text(satori_image, file_path, length, offset, fh, value):
+
+	print (fh)
+	contents = satori_image.get_attribute(file_path, _CONTENTS_S)
+	if not isinstance(contents, str):
+		ret = ""
+
+	elif offset <= len(contents) <= length + offset:
+		ret = contents[offset:length+offset]
+		# print(ret)
+	value['return'] = ret
+	return value['return']
