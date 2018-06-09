@@ -92,7 +92,7 @@ An extension file, say `bla.py` can contain all functions that are needed to Ima
 ```python
 from hooker import hook
 
-hook('imager.on_start')
+@hook('imager.on_start')
 def calc_bla(parser, args, satori_image):
   # Stuff...
 ```
@@ -106,11 +106,11 @@ This same file can be used to also serve as *Satori-Differ* extension (and it is
 ```python
 from hooker import hook
 
-hook('imager.on_start')
+@hook('imager.on_start')
 def calc_bla(parser, args, satori_image):
   # Stuff...
 
-hook('differ.on_start')
+@hook('differ.on_start')
 def diff_bla(parser, args, source,
   destination, results, diff_name):
   # Stuff...
@@ -139,12 +139,12 @@ def get_bla(image):
     # Get 'bla' using some os function
     return bla_value
   
-hook('imager.on_start')
+@hook('imager.on_start')
 def calc_bla(parser, args, satori_image):
   bla = get_bla(os)
   # Stuff...
 
-hook('differ.on_start')
+@hook('differ.on_start')
 def diff_bla(parser, args, source,
   destination, results, diff_name):
   sbla = get_bla(source)
