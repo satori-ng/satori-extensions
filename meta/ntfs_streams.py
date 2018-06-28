@@ -1,16 +1,21 @@
 # -*- coding: utf-8 -*-
 
-import os
 from hooker import hook
+from satoricore.logger import ext_logger
 
 __name__ = 'ntfs-streams'
 
 @hook("imager.pre_open")
 def find_streams(satori_image, file_path, file_type, os_context):
 
-    if file_type == 'U' or file_type == 'F':
-        command = "dir " + file_path + " /r"
-        stdout = os.popen(command).read()
+    if file_type is 'U' or file_type is 'F':
+
+        if '"' in file_path:
+            ext_logger.info("File path {} is not a valid NTFS path".format(file_path))
+            return
+
+        command = "dir \"{}\" /r".format(file_path)
+        stdout = os_context.popen(command).read()
 
         stream_dict = parse_cmd(stdout)
 
@@ -25,7 +30,6 @@ def parse_cmd(stdout):
         try:
             filename = row.split()[-1]
         except IndexError:
-            # print(row)
             continue
 
         if ":" not in filename:
