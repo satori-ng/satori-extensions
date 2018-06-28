@@ -14,7 +14,7 @@ def find_streams(satori_image, file_path, file_type, os_context):
             ext_logger.info("File path {} is not a valid NTFS path".format(file_path))
             return
 
-        command = "dir \"{}\" /r".format(file_path)
+        command = "dir \"{}\" /A /r".format(file_path)
         stdout = os_context.popen(command).read()
 
         stream_dict = parse_cmd(stdout)
